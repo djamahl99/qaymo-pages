@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VQA Dataset - Three-Stage Construction Methodology</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            line-height: 1.4;
+            color: #2c3e50;
+            background: #f8f9fa;
+            padding: 20px;
+        }
+
+        .figure-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            position: relative;
+        }
+
+        .figure-title {
+            text-align: center;
+            font-size: 28px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            letter-spacing: -0.5px;
+        }
+
+        .methodology-flow {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+            position: relative;
+            margin-bottom: 40px;
+        }
+
+        .stage-box {
+            flex: 1;
+            background: #ffffff;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .stage-box:hover {
+            border-color: #667eea;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .stage-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px dashed #e9ecef;
+        }
+
+        .stage-number {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .stage-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c3e50;
+            line-height: 1.2;
+        }
+
+        .stage-items {
+            list-style: none;
+        }
+
+        .stage-items li {
+            padding: 8px 0;
+            font-size: 14px;
+            color: #5a6c7d;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .stage-items li::before {
+            content: '▸';
+            color: #667eea;
+            font-weight: bold;
+            margin-right: 8px;
+            font-size: 16px;
+            line-height: 1;
+        }
+
+        /* Arrow connectors */
+        .arrow-connector {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .stage-box:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            right: -21px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 0;
+            height: 0;
+            border-left: 20px solid #667eea;
+            border-top: 15px solid transparent;
+            border-bottom: 15px solid transparent;
+            z-index: 1;
+        }
+
+        /* Information boxes */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .info-box {
+            background: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+
+        .info-box-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 15px;
+            background: #e9ecef;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+
+        .info-content {
+            font-size: 14px;
+            color: #6c757d;
+            line-height: 1.5;
+        }
+
+        /* Category badges */
+        .category-badges {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .category-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .badge-icon {
+            width: 24px;
+            height: 24px;
+            background: #495057;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* Examples section */
+        .examples-section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 30px;
+            margin-top: 40px;
+        }
+
+        .examples-title {
+            font-size: 22px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 25px;
+            color: #2c3e50;
+        }
+
+        .examples-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .example-item {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            position: relative;
+        }
+
+        .example-image-placeholder {
+            width: 100%;
+            height: 150px;
+            background: #e9ecef;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: #6c757d;
+        }
+
+        .example-question {
+            font-size: 15px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .example-question::before {
+            content: 'Q:';
+            color: #667eea;
+            font-weight: bold;
+            margin-right: 8px;
+            flex-shrink: 0;
+        }
+
+        .example-answer {
+            font-size: 14px;
+            color: #6c757d;
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 6px;
+            border-left: 3px solid #667eea;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .example-answer::before {
+            content: 'A:';
+            color: #764ba2;
+            font-weight: bold;
+            margin-right: 8px;
+            flex-shrink: 0;
+        }
+
+        /* Color coding for different types */
+        .type-category { background-color: #e3f2fd; border-color: #2196f3; }
+        .type-movement { background-color: #fff3e0; border-color: #ff9800; }
+        .type-appearance { background-color: #f3e5f5; border-color: #9c27b0; }
+        .type-relationship { background-color: #e8f5e9; border-color: #4caf50; }
+
+        /* Compact stats */
+        .stats-row {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            margin: 30px 0;
+        }
+
+        .stat-item {
+            text-align: center;
+            color: white;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 1024px) {
+            .methodology-flow {
+                flex-direction: column;
+            }
+
+            .stage-box:not(:last-child)::after {
+                display: none;
+            }
+
+            .info-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .figure-container {
+                padding: 20px;
+            }
+
+            .examples-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-row {
+                flex-wrap: wrap;
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="figure-container">
+        <!-- Main Title -->
+        <h1 class="figure-title">Three-Stage VQA Dataset Construction Methodology</h1>
+
+        <!-- Category Badges -->
+        <div class="category-badges">
+            <div class="category-badge type-category">
+                <span class="badge-icon">C</span>
+                <span>Category</span>
+            </div>
+            <div class="category-badge type-movement">
+                <span class="badge-icon">M</span>
+                <span>Movement</span>
+            </div>
+            <div class="category-badge type-appearance">
+                <span class="badge-icon">A</span>
+                <span>Appearance</span>
+            </div>
+            <div class="category-badge type-relationship">
+                <span class="badge-icon">R</span>
+                <span>Relationship</span>
+            </div>
+        </div>
+
+        <!-- Three-Stage Flow -->
+        <div class="methodology-flow">
+            <!-- Stage 1 -->
+            <div class="stage-box">
+                <div class="stage-header">
+                    <div class="stage-number">1</div>
+                    <h2 class="stage-title">Enhanced Object<br>Annotation</h2>
+                </div>
+                <ul class="stage-items">
+                    <li>High-quality 3D annotations</li>
+                    <li>Coarse semantic categories</li>
+                    <li>Fine-grained semantic labels (50%)</li>
+                    <li>Multi-annotator validation</li>
+                    <li>Temporal sequence validation</li>
+                </ul>
+            </div>
+
+            <!-- Stage 2 -->
+            <div class="stage-box">
+                <div class="stage-header">
+                    <div class="stage-number">2</div>
+                    <h2 class="stage-title">Hierarchical Question<br>Generation</h2>
+                </div>
+                <ul class="stage-items">
+                    <li>Binary characteristic questions</li>
+                    <li>Instance-referenced questions</li>
+                    <li>2D bounding box overlays</li>
+                    <li>Temporal trajectory analysis</li>
+                    <li>50% positive/negative balance</li>
+                </ul>
+            </div>
+
+            <!-- Stage 3 -->
+            <div class="stage-box">
+                <div class="stage-header">
+                    <div class="stage-number">3</div>
+                    <h2 class="stage-title">Evaluation &<br>Quality Control</h2>
+                </div>
+                <ul class="stage-items">
+                    <li>Multiple choice questions</li>
+                    <li>2-4 options per question</li>
+                    <li>Negative sampling</li>
+                    <li>Answer balancing</li>
+                    <li>Scene balancing</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Information Boxes -->
+        <div class="info-grid">
+            <div class="info-box">
+                <div class="info-box-title">Information</div>
+                <div class="info-icon">🚗</div>
+                <div class="info-content">
+                    NuScenes Annotation<br>
+                    Database Extraction<br>
+                    Human Manual Check
+                </div>
+            </div>
+
+            <div class="info-box">
+                <div class="info-box-title">Attributes</div>
+                <div class="info-icon">🏷️</div>
+                <div class="info-content">
+                    stopped, moving<br>
+                    car, bus, pedestrian<br>
+                    front, back, red, silver
+                </div>
+            </div>
+
+            <div class="info-box">
+                <div class="info-box-title">HoG</div>
+                <div class="info-icon">📊</div>
+                <div class="info-content">
+                    Level-1: Basic<br>
+                    Level-2: Instance<br>
+                    Level-3: Temporal<br>
+                    Level-4: Complex
+                </div>
+            </div>
+
+            <div class="info-box">
+                <div class="info-box-title">Instructions</div>
+                <div class="info-icon">📝</div>
+                <div class="info-content">
+                    Natural language<br>
+                    Color-coded objects<br>
+                    Spatial relationships
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-row">
+            <div class="stat-item">
+                <div class="stat-value">100K+</div>
+                <div class="stat-label">Questions</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">50K+</div>
+                <div class="stat-label">Images</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">10</div>
+                <div class="stat-label">Question Types</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">95%</div>
+                <div class="stat-label">Accuracy</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">4</div>
+                <div class="stat-label">Complexity Levels</div>
+            </div>
+        </div>
+
+        <!-- Examples Section -->
+        <div class="examples-section">
+            <h2 class="examples-title">Example Questions & Answers</h2>
+            <div class="examples-grid">
+                <!-- Example 1 - Category -->
+                <div class="example-item type-category">
+                    <div class="example-image-placeholder">
+                        [Traffic Scene with Vehicles]
+                    </div>
+                    <div class="example-question">
+                        Are there any stationary vehicles in the scene?
+                    </div>
+                    <div class="example-answer">
+                        Yes, there are two stationary vehicles parked on the right side.
+                    </div>
+                </div>
+
+                <!-- Example 2 - Movement -->
+                <div class="example-item type-movement">
+                    <div class="example-image-placeholder">
+                        [Scene with Red Box Overlay]
+                    </div>
+                    <div class="example-question">
+                        Which direction is the vehicle in the red box moving?
+                    </div>
+                    <div class="example-answer">
+                        The vehicle is moving forward and turning left.
+                    </div>
+                </div>
+
+                <!-- Example 3 - Appearance -->
+                <div class="example-item type-appearance">
+                    <div class="example-image-placeholder">
+                        [Multiple Vehicles Scene]
+                    </div>
+                    <div class="example-question">
+                        What color is the bus in front of the ego vehicle?
+                    </div>
+                    <div class="example-answer">
+                        The bus is yellow with black stripes.
+                    </div>
+                </div>
+
+                <!-- Example 4 - Relationship -->
+                <div class="example-item type-relationship">
+                    <div class="example-image-placeholder">
+                        [Temporal Sequence]
+                    </div>
+                    <div class="example-question">
+                        Is the pedestrian crossing in front of or behind the stopped car?
+                    </div>
+                    <div class="example-answer">
+                        The pedestrian is crossing in front of the stopped car.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
