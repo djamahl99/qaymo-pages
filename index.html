@@ -177,9 +177,9 @@
       padding: 1rem;
     }
     
-    .type-binary { border-left: 4px solid #28a745; }
-    .type-attribute { border-left: 4px solid #ffc107; }
-    .type-motion { border-left: 4px solid #dc3545; }
+    .type-binary { border-left: 4px solid #2196f3; }
+    .type-attribute { border-left: 4px solid #4caf50; }
+    .type-motion { border-left: 4px solid #9c27b0; }
     
     .question-type h4 {
       font-size: 1.1rem;
@@ -404,18 +404,31 @@
     </div>
   </section>
 
-  <!-- Three-Stage Methodology -->
+  <!-- Dataset Pipeline Overview -->
   <section class="section hero is-light">
     <div class="container is-max-desktop">
-      <h2 class="title is-3 has-text-centered">Three-Stage Construction Methodology</h2>
-
-      <img src="static/images/QAymo.png">
+      <h2 class="title is-3 has-text-centered">Box-QAymo Dataset Pipeline</h2>
       
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <img src="static/images/QAymo.png" style="width: 100%; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+        </div>
+      </div>
+      
+      <div class="content has-text-centered" style="margin-top: 1.5rem;">
+        <p class="is-size-6" style="color: #666; font-style: italic;">
+          <strong>Overview of the Box-QAymo dataset pipeline for evaluating vision-language models (VLMs).</strong> 
+          Step 1 extracts 3D metadata from Waymo which is enhanced with human-annotated semantics. 
+          Step 2 introduces box-referenced visual question answering (VQA) tasks spanning instance recognition, motion interpretation, and temporal trajectory reasoning. 
+          Step 3 implements rigorous quality control through negative sampling, temporal consistency filtering, and difficulty-aware balancing to ensure a robust and challenging dataset. 
+          Step 4 benchmarks general and domain-specific VLMs in zero-shot and fine-tuned settings.
+        </p>
+      </div>
     </div>
   </section>
 
-  <!-- Question Types -->
-  <section class="section">
+<!-- Question Types -->
+<section class="section">
     <div class="container is-max-desktop">
       <h2 class="title is-3 has-text-centered">Question Categories</h2>
       
@@ -428,16 +441,20 @@
 
         <div class="question-type type-attribute">
           <h4>Attribute Questions</h4>
-          <p><strong>Classification:</strong> "What type of object is in the red box?"</p>
-          <p><strong>Color Recognition:</strong> "What color is the highlighted object?"</p>
-          <p><strong>Facing Direction:</strong> "What direction is the object facing?"</p>
+          <p><strong>Fine-grained Classification:</strong> "What type of object is in the red box?"</p>
+          <p><strong>Color Recognition:</strong> "What color is the object highlighted in red?"</p>
+          <p><strong>Facing Direction:</strong> "What direction is the object in the red box facing?"</p>
         </div>
 
         <div class="question-type type-motion">
           <h4>Motion Questions</h4>
           <p><strong>Speed Assessment:</strong> "How fast is the blue sedan moving?"</p>
-          <p><strong>Trajectory Analysis:</strong> "Are the ego vehicle and truck on a collision course?"</p>
-          <p><strong>Path Conflict:</strong> "Is there a vehicle in the ego vehicle's future path?"</p>
+          <p><strong>Movement Direction:</strong> "What direction is the object in the red box moving?"</p>
+          <p><strong>Relative Motion Analysis:</strong> "Is the green pickup truck traveling faster than the ego vehicle?"</p>
+          <p><strong>Traffic Element Recognition:</strong> "Is the ego vehicle approaching a stop sign?"</p>
+          <p><strong>Trajectory Analysis:</strong> "Are the ego vehicle and the truck on a collision course?"</p>
+          <p><strong>Relative Motion Direction:</strong> "What is the relative motion direction of the hatchback compared to ego?"</p>
+          <p><strong>Path Conflict Detection:</strong> "Is there a vehicle in the ego vehicle's future path?"</p>
         </div>
       </div>
     </div>
@@ -524,7 +541,7 @@
       <h2 class="title">BibTeX</h2>
       <pre><code>@article{etchegaray2024boxqaymo,
   title={Box-QAymo: Box-Referring VQA Dataset for Autonomous Driving},
-  author={Etchegaray, Djamahl and Fu, Yuxia and Huang, Zi and Luo, Yadan},
+  author={Etchegaray, Djamahl, Fu, Yuxia, Huang, Zi and Luo, Yadan},
   journal={arXiv preprint},
   year={2025}
 }</code></pre>
