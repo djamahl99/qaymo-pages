@@ -292,7 +292,7 @@
             
             <div class="is-size-6 publication-authors">
               <p>UQMM Lab, University of Queensland, Brisbane, Australia</p>
-            </div>
+                          </div>
 
             <div class="column has-text-centered">
               <div class="publication-links">
@@ -408,52 +408,9 @@
   <section class="section hero is-light">
     <div class="container is-max-desktop">
       <h2 class="title is-3 has-text-centered">Three-Stage Construction Methodology</h2>
+
+      <img src="static/images/QAymo.png">
       
-      <div class="methodology-section">
-        <div class="stage-grid">
-          <div class="stage-box">
-            <div class="stage-header">
-              <div class="stage-number">1</div>
-              <h3 class="stage-title">Enhanced Object Annotation</h3>
-            </div>
-            <ul class="stage-items">
-              <li>High-quality 3D annotations from Waymo</li>
-              <li>Crowd-sourced semantic labeling</li>
-              <li>Fine-grained object categories</li>
-              <li>Color and attribute annotations</li>
-              <li>Multi-view validation</li>
-            </ul>
-          </div>
-
-          <div class="stage-box">
-            <div class="stage-header">
-              <div class="stage-number">2</div>
-              <h3 class="stage-title">Hierarchical Question Generation</h3>
-            </div>
-            <ul class="stage-items">
-              <li>Binary characteristic questions</li>
-              <li>Instance-referenced questions</li>
-              <li>Red bounding box overlays</li>
-              <li>Temporal trajectory analysis</li>
-              <li>Motion reasoning tasks</li>
-            </ul>
-          </div>
-
-          <div class="stage-box">
-            <div class="stage-header">
-              <div class="stage-number">3</div>
-              <h3 class="stage-title">Quality Control & Balancing</h3>
-            </div>
-            <ul class="stage-items">
-              <li>Negative sampling strategies</li>
-              <li>Temporal consistency filtering</li>
-              <li>Difficulty-aware balancing</li>
-              <li>Answer distribution control</li>
-              <li>Scene diversity validation</li>
-            </ul>
-          </div>
-        </div>
-      </div>
     </div>
   </section>
 
@@ -486,84 +443,59 @@
     </div>
   </section>
 
-  <!-- Setup Instructions -->
+  <!-- Code & Framework -->
   <section class="section hero is-light">
     <div class="container is-max-desktop">
-      <h2 class="title is-3 has-text-centered">Setup & Usage</h2>
+      <h2 class="title is-3 has-text-centered">Code & Framework</h2>
       
       <div class="content">
-        <h3>Prerequisites</h3>
-        <p>To create and use the Box-QAymo dataset, you'll need:</p>
-        <ul>
-          <li>Python 3.8+</li>
-          <li>Waymo Open Dataset (validation split)</li>
-          <li>Access to our crowd-sourced annotation metadata</li>
-        </ul>
+        <p>
+          Box-QAymo provides a comprehensive framework for generating, processing, and evaluating visual question answering (VQA) tasks on the Waymo dataset. The framework supports diverse question types, multiple evaluation metrics, and various answer formats.
+        </p>
 
-        <div class="code-section">
-          <h3>Installation</h3>
-          <div class="code-block">
-# Clone the repository
-git clone https://github.com/djamahl99/qaymo-dataset.git
-cd qaymo-dataset
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Download Waymo Open Dataset validation split
-# Follow instructions at: https://github.com/waymo-research/waymo-open-dataset
+        <div class="columns is-multiline">
+          <div class="column is-6">
+            <h3>Core Components</h3>
+            <ul>
+              <li><strong>Data Processing:</strong> Waymo dataset extraction and preprocessing</li>
+              <li><strong>Question Generation:</strong> Hierarchical prompt generators for different question types</li>
+              <li><strong>Model Evaluation:</strong> Support for multiple VLMs and evaluation metrics</li>
+              <li><strong>Answer Processing:</strong> Handles multiple choice, text, and bounding box answers</li>
+            </ul>
+          </div>
+          
+          <div class="column is-6">
+            <h3>Supported Models</h3>
+            <ul>
+              <li><strong>VLMs:</strong> LLaVA, Qwen-VL, SENNA</li>
+              <li><strong>Evaluation Metrics:</strong> F1, Precision, Recall</li>
+              <li><strong>Question Types:</strong> Binary, attribute, and motion reasoning</li>
+            </ul>
           </div>
         </div>
 
-        <div class="code-section">
-          <h3>Dataset Creation</h3>
-          <div class="code-block">
-# Download annotation metadata from Google Drive
-python download_metadata.py --output_dir ./metadata
-
-# Process Waymo scenes and generate questions
-python create_dataset.py \
-    --waymo_dir /path/to/waymo/validation \
-    --metadata_dir ./metadata \
-    --output_dir ./box_qaymo_dataset
-
-# Validate dataset integrity
-python validate_dataset.py --dataset_dir ./box_qaymo_dataset
-          </div>
+        <div class="has-text-centered" style="margin-top: 2rem;">
+          <a href="https://github.com/djamahl99/box-qaymo" target="_blank" class="button is-primary is-large">
+            <span class="icon">
+              <i class="fab fa-github"></i>
+            </span>
+            <span>View Code & Setup Instructions</span>
+          </a>
         </div>
 
-        <div class="code-section">
-          <h3>Evaluation</h3>
-          <div class="code-block">
-# Evaluate a VLM on the dataset
-python evaluate_vlm.py \
-    --model_name llava-1.5-7b \
-    --dataset_dir ./box_qaymo_dataset \
-    --output_dir ./results
-
-# Generate performance reports
-python generate_report.py \
-    --results_dir ./results \
-    --output_report ./performance_report.json
-          </div>
-        </div>
-
-        <h3>Data Structure</h3>
-        <p>The dataset follows this structure:</p>
-        <div class="code-block">
-box_qaymo_dataset/
-├── questions/
-│   ├── binary_questions.json
-│   ├── attribute_questions.json
-│   └── motion_questions.json
-├── images/
-│   └── [scene_id]/
-│       └── [camera_views]/
-├── annotations/
-│   └── crowdsourced_labels.json
-└── metadata/
-    ├── object_trajectories.json
-    └── scene_info.json
+        <div style="margin-top: 2rem; padding: 1.5rem; background: #f8f9fa; border-radius: 8px;">
+          <h3>Quick Start</h3>
+          <p>
+            For detailed setup instructions, including Waymo dataset preprocessing, crowd-sourced metadata download, 
+            and model evaluation scripts, please visit our GitHub repository. The repository includes:
+          </p>
+          <ul>
+            <li>Complete installation and setup guide</li>
+            <li>Waymo dataset extraction scripts</li>
+            <li>VQA dataset generation pipeline</li>
+            <li>Model evaluation and comparison tools</li>
+            <li>Pre-trained model integration</li>
+          </ul>
         </div>
       </div>
     </div>
@@ -572,57 +504,7 @@ box_qaymo_dataset/
   <!-- Results -->
   <section class="section">
     <div class="container is-max-desktop">
-      <h2 class="title is-3 has-text-centered">Evaluation Results</h2>
-      
-      <div class="performance-grid">
-        <div class="performance-box">
-          <h3 class="performance-title">Binary Questions (F1 %)</h3>
-          <div class="model-result">
-            <span class="model-name">Qwen-VL</span>
-            <span class="f1-score">74.5</span>
-          </div>
-          <div class="model-result">
-            <span class="model-name">LLaVA-1.5</span>
-            <span class="f1-score">67.1</span>
-          </div>
-          <div class="model-result">
-            <span class="model-name">Senna</span>
-            <span class="f1-score">61.1</span>
-          </div>
-        </div>
-
-        <div class="performance-box">
-          <h3 class="performance-title">Attribute Questions (F1 %)</h3>
-          <div class="model-result">
-            <span class="model-name">Qwen-VL</span>
-            <span class="f1-score">27.6</span>
-          </div>
-          <div class="model-result">
-            <span class="model-name">LLaVA-1.5 (FT)</span>
-            <span class="f1-score">25.9</span>
-          </div>
-          <div class="model-result">
-            <span class="model-name">LLaVA-1.5</span>
-            <span class="f1-score">12.0</span>
-          </div>
-        </div>
-
-        <div class="performance-box">
-          <h3 class="performance-title">Motion Questions (F1 %)</h3>
-          <div class="model-result">
-            <span class="model-name">Qwen-VL</span>
-            <span class="f1-score">52.9</span>
-          </div>
-          <div class="model-result">
-            <span class="model-name">LLaVA-1.5</span>
-            <span class="f1-score">49.2</span>
-          </div>
-          <div class="model-result">
-            <span class="model-name">Senna</span>
-            <span class="f1-score">20.5</span>
-          </div>
-        </div>
-      </div>
+      <h2 class="title is-3 has-text-centered">Results</h2>
 
       <div class="content">
         <h3>Key Findings</h3>
@@ -642,9 +524,9 @@ box_qaymo_dataset/
       <h2 class="title">BibTeX</h2>
       <pre><code>@article{etchegaray2024boxqaymo,
   title={Box-QAymo: Box-Referring VQA Dataset for Autonomous Driving},
-  author={Etchegaray, Djamahl and Huang, Zi and Harada, Tatsuya and Luo, Yadan},
+  author={Etchegaray, Djamahl and Fu, Yuxia and Huang, Zi and Luo, Yadan},
   journal={arXiv preprint},
-  year={2024}
+  year={2025}
 }</code></pre>
     </div>
   </section>
