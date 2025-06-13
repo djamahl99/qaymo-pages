@@ -1,561 +1,667 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VQA Dataset - Three-Stage Construction Methodology</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="utf-8">
+  <meta name="description" content="Box-QAymo: A box-referring VQA dataset for evaluating vision-language models on spatial and temporal reasoning in autonomous driving scenarios.">
+  <meta property="og:title" content="Box-QAymo: Box-Referring VQA Dataset for Autonomous Driving"/>
+  <meta property="og:description" content="A hierarchical evaluation framework for VLMs featuring crowd-sourced semantic annotations, box-referring questions, and temporal reasoning tasks."/>
+  <meta property="og:url" content="https://djamahl99.github.io/qaymo-pages/"/>
+  <meta property="og:image" content="static/images/your_banner_image.png" />
+  <meta property="og:image:width" content="1200"/>
+  <meta property="og:image:height" content="630"/>
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
-            line-height: 1.4;
-            color: #2c3e50;
-            background: #f8f9fa;
-            padding: 20px;
-        }
+  <meta name="twitter:title" content="Box-QAymo: Box-Referring VQA Dataset"/>
+  <meta name="twitter:description" content="Hierarchical VQA evaluation for autonomous driving with crowd-sourced semantics and temporal reasoning."/>
+  <meta name="twitter:image" content="static/images/your_twitter_banner_image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="keywords" content="VQA, Visual Question Answering, Autonomous Driving, Vision-Language Models, Box-Referring, Temporal Reasoning, Dataset, Benchmark">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        .figure-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            padding: 30px;
-            position: relative;
-        }
-
-        .figure-title {
-            text-align: center;
-            font-size: 28px;
-            font-weight: 700;
-            color: #2c3e50;
-            margin-bottom: 30px;
-            letter-spacing: -0.5px;
-        }
-
-        .methodology-flow {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 20px;
-            position: relative;
-            margin-bottom: 40px;
-        }
-
-        .stage-box {
-            flex: 1;
-            background: #ffffff;
-            border: 2px solid #e9ecef;
-            border-radius: 12px;
-            padding: 20px;
-            position: relative;
-            transition: all 0.3s ease;
-        }
-
-        .stage-box:hover {
-            border-color: #667eea;
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.15);
-            transform: translateY(-2px);
-        }
-
-        .stage-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px dashed #e9ecef;
-        }
-
-        .stage-number {
-            width: 45px;
-            height: 45px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            font-size: 20px;
-            font-weight: bold;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 15px;
-            flex-shrink: 0;
-        }
-
-        .stage-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: #2c3e50;
-            line-height: 1.2;
-        }
-
-        .stage-items {
-            list-style: none;
-        }
-
-        .stage-items li {
-            padding: 8px 0;
-            font-size: 14px;
-            color: #5a6c7d;
-            display: flex;
-            align-items: flex-start;
-        }
-
-        .stage-items li::before {
-            content: '▸';
-            color: #667eea;
-            font-weight: bold;
-            margin-right: 8px;
-            font-size: 16px;
-            line-height: 1;
-        }
-
-        /* Arrow connectors */
-        .arrow-connector {
-            position: absolute;
-            width: 40px;
-            height: 40px;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-
-        .stage-box:not(:last-child)::after {
-            content: '';
-            position: absolute;
-            right: -21px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 0;
-            height: 0;
-            border-left: 20px solid #667eea;
-            border-top: 15px solid transparent;
-            border-bottom: 15px solid transparent;
-            z-index: 1;
-        }
-
-        /* Information boxes */
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            margin-bottom: 40px;
-        }
-
-        .info-box {
-            background: #f8f9fa;
-            border: 2px dashed #dee2e6;
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-            position: relative;
-        }
-
-        .info-box-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #495057;
-            margin-bottom: 15px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .info-icon {
-            width: 60px;
-            height: 60px;
-            margin: 0 auto 15px;
-            background: #e9ecef;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-        }
-
-        .info-content {
-            font-size: 14px;
-            color: #6c757d;
-            line-height: 1.5;
-        }
-
-        /* Category badges */
-        .category-badges {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .category-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            background: #f8f9fa;
-            border: 2px solid #e9ecef;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .badge-icon {
-            width: 24px;
-            height: 24px;
-            background: #495057;
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        /* Examples section */
-        .examples-section {
-            background: #f8f9fa;
-            border-radius: 12px;
-            padding: 30px;
-            margin-top: 40px;
-        }
-
-        .examples-title {
-            font-size: 22px;
-            font-weight: 600;
-            text-align: center;
-            margin-bottom: 25px;
-            color: #2c3e50;
-        }
-
-        .examples-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-        }
-
-        .example-item {
-            background: white;
-            border: 2px solid #e9ecef;
-            border-radius: 10px;
-            padding: 20px;
-            position: relative;
-        }
-
-        .example-image-placeholder {
-            width: 100%;
-            height: 150px;
-            background: #e9ecef;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 15px;
-            font-size: 14px;
-            color: #6c757d;
-        }
-
-        .example-question {
-            font-size: 15px;
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: flex-start;
-        }
-
-        .example-question::before {
-            content: 'Q:';
-            color: #667eea;
-            font-weight: bold;
-            margin-right: 8px;
-            flex-shrink: 0;
-        }
-
-        .example-answer {
-            font-size: 14px;
-            color: #6c757d;
-            background: #f8f9fa;
-            padding: 10px;
-            border-radius: 6px;
-            border-left: 3px solid #667eea;
-            display: flex;
-            align-items: flex-start;
-        }
-
-        .example-answer::before {
-            content: 'A:';
-            color: #764ba2;
-            font-weight: bold;
-            margin-right: 8px;
-            flex-shrink: 0;
-        }
-
-        /* Color coding for different types */
-        .type-category { background-color: #e3f2fd; border-color: #2196f3; }
-        .type-movement { background-color: #fff3e0; border-color: #ff9800; }
-        .type-appearance { background-color: #f3e5f5; border-color: #9c27b0; }
-        .type-relationship { background-color: #e8f5e9; border-color: #4caf50; }
-
-        /* Compact stats */
-        .stats-row {
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 10px;
-            margin: 30px 0;
-        }
-
-        .stat-item {
-            text-align: center;
-            color: white;
-        }
-
-        .stat-value {
-            font-size: 28px;
-            font-weight: 700;
-            line-height: 1;
-        }
-
-        .stat-label {
-            font-size: 14px;
-            opacity: 0.9;
-            margin-top: 5px;
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 1024px) {
-            .methodology-flow {
-                flex-direction: column;
-            }
-
-            .stage-box:not(:last-child)::after {
-                display: none;
-            }
-
-            .info-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 768px) {
-            .figure-container {
-                padding: 20px;
-            }
-
-            .examples-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .stats-row {
-                flex-wrap: wrap;
-                gap: 20px;
-            }
-        }
-    </style>
+  <title>Box-QAymo | VQA Dataset for Autonomous Driving</title>
+  <link rel="icon" type="image/x-icon" href="static/images/favicon.ico">
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.4/css/bulma.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  
+  <style>
+    .publication-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 1rem;
+    }
+    
+    .publication-authors {
+      margin-bottom: 1rem;
+    }
+    
+    .author-block {
+      margin-right: 1rem;
+    }
+    
+    .publication-links {
+      margin-top: 1.5rem;
+    }
+    
+    .button {
+      margin: 0.25rem;
+    }
+    
+    .hero-body {
+      padding: 3rem 1.5rem;
+    }
+    
+    .section {
+      padding: 3rem 1.5rem;
+    }
+    
+    .content {
+      line-height: 1.7;
+    }
+    
+    .content p {
+      margin-bottom: 1.5rem;
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+    
+    .stat-box {
+      background: #f8f9fa;
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      padding: 1.5rem;
+      text-align: center;
+    }
+    
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #3273dc;
+    }
+    
+    .stat-label {
+      font-size: 1rem;
+      color: #666;
+      margin-top: 0.5rem;
+    }
+    
+    .methodology-section {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2rem 0;
+    }
+    
+    .stage-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+    
+    .stage-box {
+      background: white;
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      padding: 1.5rem;
+      transition: all 0.3s ease;
+    }
+    
+    .stage-box:hover {
+      border-color: #3273dc;
+      box-shadow: 0 4px 12px rgba(50, 115, 220, 0.15);
+    }
+    
+    .stage-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    
+    .stage-number {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #3273dc, #667eea);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      margin-right: 1rem;
+    }
+    
+    .stage-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #333;
+    }
+    
+    .stage-items {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    
+    .stage-items li {
+      padding: 0.25rem 0;
+      color: #666;
+      position: relative;
+      padding-left: 1rem;
+    }
+    
+    .stage-items li::before {
+      content: '▸';
+      color: #3273dc;
+      font-weight: bold;
+      position: absolute;
+      left: 0;
+    }
+    
+    .question-types {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    
+    .question-type {
+      background: white;
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      padding: 1rem;
+    }
+    
+    .type-binary { border-left: 4px solid #28a745; }
+    .type-attribute { border-left: 4px solid #ffc107; }
+    .type-motion { border-left: 4px solid #dc3545; }
+    
+    .question-type h4 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    
+    .question-type p {
+      font-size: 0.9rem;
+      color: #666;
+      margin: 0;
+    }
+    
+    .performance-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin: 1.5rem 0;
+    }
+    
+    .performance-box {
+      background: white;
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      padding: 1.5rem;
+    }
+    
+    .performance-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: #333;
+    }
+    
+    .model-result {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .model-result:last-child {
+      border-bottom: none;
+    }
+    
+    .model-name {
+      font-weight: 500;
+    }
+    
+    .f1-score {
+      font-weight: 600;
+      color: #3273dc;
+    }
+    
+    .code-section {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+    }
+    
+    .code-block {
+      background: #2d3748;
+      color: #e2e8f0;
+      padding: 1rem;
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+      overflow-x: auto;
+    }
+    
+    @media (max-width: 768px) {
+      .publication-title {
+        font-size: 2rem;
+      }
+      
+      .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      }
+      
+      .stage-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
+
 <body>
-    <div class="figure-container">
-        <!-- Main Title -->
-        <h1 class="figure-title">Three-Stage VQA Dataset Construction Methodology</h1>
+  <section class="hero">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered">
+          <div class="column has-text-centered">
+            <h1 class="title publication-title">Box-QAymo: Box-Referring VQA Dataset for Autonomous Driving</h1>
+            
+            <div class="is-size-5 publication-authors">
+              <span class="author-block">
+                <a href="https://djamahl99.github.io" target="_blank">Djamahl Etchegaray</a>,
+              </span>
+              <span class="author-block">
+                <a href="#" target="_blank">Yuxia Fu</a>,
+              </span>
+              <span class="author-block">
+                <a href="#" target="_blank">Zi Huang</a>,
+              </span>
+              <span class="author-block">
+                <a href="#" target="_blank">Yadan Luo</a>
+              </span>
+            </div>
+            
+            <div class="is-size-6 publication-authors">
+              <p>UQMM Lab, University of Queensland, Brisbane, Australia</p>
+            </div>
 
-        <!-- Category Badges -->
-        <div class="category-badges">
-            <div class="category-badge type-category">
-                <span class="badge-icon">C</span>
-                <span>Category</span>
+            <div class="column has-text-centered">
+              <div class="publication-links">
+                <span class="link-block">
+                  <a href="#" target="_blank" class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      <i class="fas fa-file-pdf"></i>
+                    </span>
+                    <span>Paper</span>
+                  </a>
+                </span>
+
+                <span class="link-block">
+                  <a href="https://github.com/djamahl99/box-qaymo" target="_blank" class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      <i class="fab fa-github"></i>
+                    </span>
+                    <span>Code</span>
+                  </a>
+                </span>
+
+                <span class="link-block">
+                  <a href="#" target="_blank" class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      <i class="fas fa-database"></i>
+                    </span>
+                    <span>Dataset</span>
+                  </a>
+                </span>
+
+                <span class="link-block">
+                  <a href="#" target="_blank" class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      <i class="ai ai-arxiv"></i>
+                    </span>
+                    <span>arXiv</span>
+                  </a>
+                </span>
+              </div>
             </div>
-            <div class="category-badge type-movement">
-                <span class="badge-icon">M</span>
-                <span>Movement</span>
-            </div>
-            <div class="category-badge type-appearance">
-                <span class="badge-icon">A</span>
-                <span>Appearance</span>
-            </div>
-            <div class="category-badge type-relationship">
-                <span class="badge-icon">R</span>
-                <span>Relationship</span>
-            </div>
+          </div>
         </div>
-
-        <!-- Three-Stage Flow -->
-        <div class="methodology-flow">
-            <!-- Stage 1 -->
-            <div class="stage-box">
-                <div class="stage-header">
-                    <div class="stage-number">1</div>
-                    <h2 class="stage-title">Enhanced Object<br>Annotation</h2>
-                </div>
-                <ul class="stage-items">
-                    <li>High-quality 3D annotations</li>
-                    <li>Coarse semantic categories</li>
-                    <li>Fine-grained semantic labels (50%)</li>
-                    <li>Multi-annotator validation</li>
-                    <li>Temporal sequence validation</li>
-                </ul>
-            </div>
-
-            <!-- Stage 2 -->
-            <div class="stage-box">
-                <div class="stage-header">
-                    <div class="stage-number">2</div>
-                    <h2 class="stage-title">Hierarchical Question<br>Generation</h2>
-                </div>
-                <ul class="stage-items">
-                    <li>Binary characteristic questions</li>
-                    <li>Instance-referenced questions</li>
-                    <li>2D bounding box overlays</li>
-                    <li>Temporal trajectory analysis</li>
-                    <li>50% positive/negative balance</li>
-                </ul>
-            </div>
-
-            <!-- Stage 3 -->
-            <div class="stage-box">
-                <div class="stage-header">
-                    <div class="stage-number">3</div>
-                    <h2 class="stage-title">Evaluation &<br>Quality Control</h2>
-                </div>
-                <ul class="stage-items">
-                    <li>Multiple choice questions</li>
-                    <li>2-4 options per question</li>
-                    <li>Negative sampling</li>
-                    <li>Answer balancing</li>
-                    <li>Scene balancing</li>
-                </ul>
-            </div>
-        </div>
-
-        <!-- Information Boxes -->
-        <div class="info-grid">
-            <div class="info-box">
-                <div class="info-box-title">Information</div>
-                <div class="info-icon">🚗</div>
-                <div class="info-content">
-                    NuScenes Annotation<br>
-                    Database Extraction<br>
-                    Human Manual Check
-                </div>
-            </div>
-
-            <div class="info-box">
-                <div class="info-box-title">Attributes</div>
-                <div class="info-icon">🏷️</div>
-                <div class="info-content">
-                    stopped, moving<br>
-                    car, bus, pedestrian<br>
-                    front, back, red, silver
-                </div>
-            </div>
-
-            <div class="info-box">
-                <div class="info-box-title">HoG</div>
-                <div class="info-icon">📊</div>
-                <div class="info-content">
-                    Level-1: Basic<br>
-                    Level-2: Instance<br>
-                    Level-3: Temporal<br>
-                    Level-4: Complex
-                </div>
-            </div>
-
-            <div class="info-box">
-                <div class="info-box-title">Instructions</div>
-                <div class="info-icon">📝</div>
-                <div class="info-content">
-                    Natural language<br>
-                    Color-coded objects<br>
-                    Spatial relationships
-                </div>
-            </div>
-        </div>
-
-        <!-- Stats -->
-        <div class="stats-row">
-            <div class="stat-item">
-                <div class="stat-value">100K+</div>
-                <div class="stat-label">Questions</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-value">50K+</div>
-                <div class="stat-label">Images</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-value">10</div>
-                <div class="stat-label">Question Types</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-value">95%</div>
-                <div class="stat-label">Accuracy</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-value">4</div>
-                <div class="stat-label">Complexity Levels</div>
-            </div>
-        </div>
-
-        <!-- Examples Section -->
-        <div class="examples-section">
-            <h2 class="examples-title">Example Questions & Answers</h2>
-            <div class="examples-grid">
-                <!-- Example 1 - Category -->
-                <div class="example-item type-category">
-                    <div class="example-image-placeholder">
-                        [Traffic Scene with Vehicles]
-                    </div>
-                    <div class="example-question">
-                        Are there any stationary vehicles in the scene?
-                    </div>
-                    <div class="example-answer">
-                        Yes, there are two stationary vehicles parked on the right side.
-                    </div>
-                </div>
-
-                <!-- Example 2 - Movement -->
-                <div class="example-item type-movement">
-                    <div class="example-image-placeholder">
-                        [Scene with Red Box Overlay]
-                    </div>
-                    <div class="example-question">
-                        Which direction is the vehicle in the red box moving?
-                    </div>
-                    <div class="example-answer">
-                        The vehicle is moving forward and turning left.
-                    </div>
-                </div>
-
-                <!-- Example 3 - Appearance -->
-                <div class="example-item type-appearance">
-                    <div class="example-image-placeholder">
-                        [Multiple Vehicles Scene]
-                    </div>
-                    <div class="example-question">
-                        What color is the bus in front of the ego vehicle?
-                    </div>
-                    <div class="example-answer">
-                        The bus is yellow with black stripes.
-                    </div>
-                </div>
-
-                <!-- Example 4 - Relationship -->
-                <div class="example-item type-relationship">
-                    <div class="example-image-placeholder">
-                        [Temporal Sequence]
-                    </div>
-                    <div class="example-question">
-                        Is the pedestrian crossing in front of or behind the stopped car?
-                    </div>
-                    <div class="example-answer">
-                        The pedestrian is crossing in front of the stopped car.
-                    </div>
-                </div>
-            </div>
-        </div>
+      </div>
     </div>
+  </section>
+
+  <!-- Abstract -->
+  <section class="section hero is-light">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Abstract</h2>
+          <div class="content has-text-justified">
+            <p>
+              Interpretable communication is essential for safe and trustworthy autonomous driving, yet current vision-language models (VLMs) often operate under idealized assumptions and struggle to capture user intent in real-world scenarios. Existing driving-oriented VQA datasets are limited to full-scene descriptions or waypoint prediction, preventing the assessment of whether VLMs can respond to localized user-driven queries.
+            </p>
+            <p>
+              We introduce <strong>Box-QAymo</strong>, a box-referring dataset and benchmark designed to both evaluate and finetune VLMs on spatial and temporal reasoning over user-specified objects. Users express intent by drawing bounding boxes, offering a fast and intuitive interface for focused queries in complex scenes.
+            </p>
+            <p>
+              Specifically, we propose a hierarchical evaluation protocol that begins with binary sanity-check questions to assess basic model capacities, and progresses to (1) attribute prediction for box-referred objects, (2) motion understanding of target instances, and (3) spatiotemporal motion reasoning over inter-object dynamics across frames.
+            </p>
+            <p>
+              To support this, we crowd-sourced fine-grained object classes and visual attributes that reflect the complexity drivers encounter, and extract object trajectories to construct temporally grounded QA pairs. Rigorous quality control through negative sampling, temporal consistency checks, and difficulty-aware balancing guarantee dataset robustness and diversity.
+            </p>
+            <p>
+              Our comprehensive evaluation reveals significant limitations in current VLMs when queried about perception questions, highlighting the gap in achieving real-world performance. This work provides a foundation for developing more robust and interpretable autonomous driving systems that can communicate effectively with users under real-world conditions.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Dataset Statistics -->
+  <section class="section">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Dataset Statistics</h2>
+          <div class="stats-grid">
+            <div class="stat-box">
+              <div class="stat-number">20,779</div>
+              <div class="stat-label">Total Questions</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-number">1,662</div>
+              <div class="stat-label">Binary Questions</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-number">5,403</div>
+              <div class="stat-label">Attribute Questions</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-number">13,714</div>
+              <div class="stat-label">Motion Questions</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-number">202</div>
+              <div class="stat-label">Scenes</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-number">50%</div>
+              <div class="stat-label">Objects Annotated</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Three-Stage Methodology -->
+  <section class="section hero is-light">
+    <div class="container is-max-desktop">
+      <h2 class="title is-3 has-text-centered">Three-Stage Construction Methodology</h2>
+      
+      <div class="methodology-section">
+        <div class="stage-grid">
+          <div class="stage-box">
+            <div class="stage-header">
+              <div class="stage-number">1</div>
+              <h3 class="stage-title">Enhanced Object Annotation</h3>
+            </div>
+            <ul class="stage-items">
+              <li>High-quality 3D annotations from Waymo</li>
+              <li>Crowd-sourced semantic labeling</li>
+              <li>Fine-grained object categories</li>
+              <li>Color and attribute annotations</li>
+              <li>Multi-view validation</li>
+            </ul>
+          </div>
+
+          <div class="stage-box">
+            <div class="stage-header">
+              <div class="stage-number">2</div>
+              <h3 class="stage-title">Hierarchical Question Generation</h3>
+            </div>
+            <ul class="stage-items">
+              <li>Binary characteristic questions</li>
+              <li>Instance-referenced questions</li>
+              <li>Red bounding box overlays</li>
+              <li>Temporal trajectory analysis</li>
+              <li>Motion reasoning tasks</li>
+            </ul>
+          </div>
+
+          <div class="stage-box">
+            <div class="stage-header">
+              <div class="stage-number">3</div>
+              <h3 class="stage-title">Quality Control & Balancing</h3>
+            </div>
+            <ul class="stage-items">
+              <li>Negative sampling strategies</li>
+              <li>Temporal consistency filtering</li>
+              <li>Difficulty-aware balancing</li>
+              <li>Answer distribution control</li>
+              <li>Scene diversity validation</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Question Types -->
+  <section class="section">
+    <div class="container is-max-desktop">
+      <h2 class="title is-3 has-text-centered">Question Categories</h2>
+      
+      <div class="question-types">
+        <div class="question-type type-binary">
+          <h4>Binary Questions</h4>
+          <p><strong>Movement Status:</strong> "Are there any stationary vehicles?"</p>
+          <p><strong>Orientation:</strong> "Are there any vehicles moving towards the camera?"</p>
+        </div>
+
+        <div class="question-type type-attribute">
+          <h4>Attribute Questions</h4>
+          <p><strong>Classification:</strong> "What type of object is in the red box?"</p>
+          <p><strong>Color Recognition:</strong> "What color is the highlighted object?"</p>
+          <p><strong>Facing Direction:</strong> "What direction is the object facing?"</p>
+        </div>
+
+        <div class="question-type type-motion">
+          <h4>Motion Questions</h4>
+          <p><strong>Speed Assessment:</strong> "How fast is the blue sedan moving?"</p>
+          <p><strong>Trajectory Analysis:</strong> "Are the ego vehicle and truck on a collision course?"</p>
+          <p><strong>Path Conflict:</strong> "Is there a vehicle in the ego vehicle's future path?"</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Setup Instructions -->
+  <section class="section hero is-light">
+    <div class="container is-max-desktop">
+      <h2 class="title is-3 has-text-centered">Setup & Usage</h2>
+      
+      <div class="content">
+        <h3>Prerequisites</h3>
+        <p>To create and use the Box-QAymo dataset, you'll need:</p>
+        <ul>
+          <li>Python 3.8+</li>
+          <li>Waymo Open Dataset (validation split)</li>
+          <li>Access to our crowd-sourced annotation metadata</li>
+        </ul>
+
+        <div class="code-section">
+          <h3>Installation</h3>
+          <div class="code-block">
+# Clone the repository
+git clone https://github.com/djamahl99/qaymo-dataset.git
+cd qaymo-dataset
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Download Waymo Open Dataset validation split
+# Follow instructions at: https://github.com/waymo-research/waymo-open-dataset
+          </div>
+        </div>
+
+        <div class="code-section">
+          <h3>Dataset Creation</h3>
+          <div class="code-block">
+# Download annotation metadata from Google Drive
+python download_metadata.py --output_dir ./metadata
+
+# Process Waymo scenes and generate questions
+python create_dataset.py \
+    --waymo_dir /path/to/waymo/validation \
+    --metadata_dir ./metadata \
+    --output_dir ./box_qaymo_dataset
+
+# Validate dataset integrity
+python validate_dataset.py --dataset_dir ./box_qaymo_dataset
+          </div>
+        </div>
+
+        <div class="code-section">
+          <h3>Evaluation</h3>
+          <div class="code-block">
+# Evaluate a VLM on the dataset
+python evaluate_vlm.py \
+    --model_name llava-1.5-7b \
+    --dataset_dir ./box_qaymo_dataset \
+    --output_dir ./results
+
+# Generate performance reports
+python generate_report.py \
+    --results_dir ./results \
+    --output_report ./performance_report.json
+          </div>
+        </div>
+
+        <h3>Data Structure</h3>
+        <p>The dataset follows this structure:</p>
+        <div class="code-block">
+box_qaymo_dataset/
+├── questions/
+│   ├── binary_questions.json
+│   ├── attribute_questions.json
+│   └── motion_questions.json
+├── images/
+│   └── [scene_id]/
+│       └── [camera_views]/
+├── annotations/
+│   └── crowdsourced_labels.json
+└── metadata/
+    ├── object_trajectories.json
+    └── scene_info.json
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Results -->
+  <section class="section">
+    <div class="container is-max-desktop">
+      <h2 class="title is-3 has-text-centered">Evaluation Results</h2>
+      
+      <div class="performance-grid">
+        <div class="performance-box">
+          <h3 class="performance-title">Binary Questions (F1 %)</h3>
+          <div class="model-result">
+            <span class="model-name">Qwen-VL</span>
+            <span class="f1-score">74.5</span>
+          </div>
+          <div class="model-result">
+            <span class="model-name">LLaVA-1.5</span>
+            <span class="f1-score">67.1</span>
+          </div>
+          <div class="model-result">
+            <span class="model-name">Senna</span>
+            <span class="f1-score">61.1</span>
+          </div>
+        </div>
+
+        <div class="performance-box">
+          <h3 class="performance-title">Attribute Questions (F1 %)</h3>
+          <div class="model-result">
+            <span class="model-name">Qwen-VL</span>
+            <span class="f1-score">27.6</span>
+          </div>
+          <div class="model-result">
+            <span class="model-name">LLaVA-1.5 (FT)</span>
+            <span class="f1-score">25.9</span>
+          </div>
+          <div class="model-result">
+            <span class="model-name">LLaVA-1.5</span>
+            <span class="f1-score">12.0</span>
+          </div>
+        </div>
+
+        <div class="performance-box">
+          <h3 class="performance-title">Motion Questions (F1 %)</h3>
+          <div class="model-result">
+            <span class="model-name">Qwen-VL</span>
+            <span class="f1-score">52.9</span>
+          </div>
+          <div class="model-result">
+            <span class="model-name">LLaVA-1.5</span>
+            <span class="f1-score">49.2</span>
+          </div>
+          <div class="model-result">
+            <span class="model-name">Senna</span>
+            <span class="f1-score">20.5</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="content">
+        <h3>Key Findings</h3>
+        <ul>
+          <li><strong>Hierarchical Complexity:</strong> Performance decreases from binary (66.1%) to attribute (18.3%) to motion (37.6%) questions, validating our complexity assumptions.</li>
+          <li><strong>Box Grounding:</strong> Red bounding boxes consistently improve performance, with Qwen-VL showing +1.39% F1 improvement on average.</li>
+          <li><strong>Temporal Reasoning:</strong> Counter-intuitively, two-frame inputs degrade performance compared to single frames, suggesting current VLMs struggle with short-term temporal integration.</li>
+          <li><strong>Domain Specificity:</strong> Senna's poor performance despite being driving-specific reveals brittleness of narrow task training.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Citation -->
+  <section class="section" id="BibTeX">
+    <div class="container is-max-desktop content">
+      <h2 class="title">BibTeX</h2>
+      <pre><code>@article{etchegaray2024boxqaymo,
+  title={Box-QAymo: Box-Referring VQA Dataset for Autonomous Driving},
+  author={Etchegaray, Djamahl and Huang, Zi and Harada, Tatsuya and Luo, Yadan},
+  journal={arXiv preprint},
+  year={2024}
+}</code></pre>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="columns is-centered">
+        <div class="column is-8">
+          <div class="content">
+            <p>
+              This page was built using the <a href="https://github.com/eliahuhorwitz/Academic-project-page-template" target="_blank">Academic Project Page Template</a>. 
+              This website is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
 </body>
 </html>
